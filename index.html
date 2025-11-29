@@ -10,6 +10,9 @@
 style="border:1px solid #d3d3d3;">
 Your browser does not support the HTML5 canvas tag.</canvas>
 
+
+
+
 <script>
 //////////
 //Init
@@ -21,6 +24,9 @@ var player_x = 0;
 var player_y = 0;
 var rocketMoveUp = 45;
 var rocketMoveDown = 45;
+var test;
+var test_x;
+var test_y;
 
 
 function Init()
@@ -28,7 +34,8 @@ function Init()
 	canvas = document.getElementById("myCanvas");
 	ctx = canvas.getContext("2d");
 	player_img = new Image();
-	player_img.src = "rocket.png";
+	player_img.src = "images/rocket.png";
+
 }
 
 //set main loop and frame rate
@@ -51,6 +58,7 @@ function Draw()
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 
 	ctx.drawImage(player_img,player_x,player_y);
+	ctx.drawImage(test,test_x,test_y)
 }
 
 //////////
