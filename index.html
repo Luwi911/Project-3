@@ -5,6 +5,7 @@
 </head>
 <body onload="Init()">
 
+<button id="startBtn" style="padding: 10px 20px; font-size: 16px; margin-bottom: 10px;">Start Game</button>
 
 <canvas id="myCanvas" width="900" height="700"
 style="border:1px solid #d3d3d3;">
@@ -39,15 +40,16 @@ var meteor4_y = 20;
 var meteor5_x = 2000;
 var meteor5_y = 300;
 
-var meteor_speed = 10;
-var meteor2_speed = 10;
-var meteor3_speed = 10;
-var meteor4_speed = 10;
-var meteor5_speed = 10;
+var meteor_speed = 8 + Math.random() * 4;
+var meteor2_speed = 8 + Math.random() * 4;
+var meteor3_speed = 8 + Math.random() * 4;
+var meteor4_speed = 8 + Math.random() * 4;
+var meteor5_speed = 8 + Math.random() * 4;
 
 var rockethit = false;
 var bg_img;
 var keys = {};
+var gameStarted = false;
 
 function Init()
 {
@@ -59,19 +61,28 @@ function Init()
 	meteor_img.src = "images/meteor.gif"
 	bg_img = new Image();
 	bg_img.src = "images/space.png"
+
+	meteor_y = Math.random() * (canvas.height - 90);
+	meteor2_y = Math.random() * (canvas.height - 90);
+	meteor3_y = Math.random() * (canvas.height - 90);
+	meteor4_y = Math.random() * (canvas.height - 90);
+	meteor5_y = Math.random() * (canvas.height - 90);
 }
 
 //set main loop and frame rate
 setInterval(MainLoop, 16);
 window.addEventListener('keydown', KeyDown);
 window.addEventListener('keyup', KeyUp);
+document.getElementById('startBtn').addEventListener('click', StartGame);
 
 //////////
 //Min loop
 //////////
 function MainLoop()
 {
-	Update();
+	if(gameStarted && !rockethit){
+		Update();
+	}
 	Draw();
 }
 
@@ -88,50 +99,55 @@ function Update()
 
  meteor_x-= meteor_speed;
  if (meteor_x<=0){
-	meteor_speed+=5;
+	meteor_speed = 8 + Math.random() * 4;
+	meteor_y = Math.random() * (canvas.height - 90);
 	meteor_x=910
-	
  }
   meteor2_x-= meteor2_speed;
  if (meteor2_x<=0){
-	meteor2_speed+=5;
+	meteor2_speed = 8 + Math.random() * 4;
+	meteor2_y = Math.random() * (canvas.height - 90);
 	meteor2_x=910
  }
 
  meteor3_x-= meteor3_speed;
  if (meteor3_x<=0){
-	meteor3_speed+=5;
+	meteor3_speed = 8 + Math.random() * 4;
+	meteor3_y = Math.random() * (canvas.height - 90);
 	meteor3_x=910
  }
  meteor4_x-= meteor4_speed;
  if (meteor4_x<=0){
-	meteor4_speed+=5;
+	meteor4_speed = 8 + Math.random() * 4;
+	meteor4_y = Math.random() * (canvas.height - 90);
 	meteor4_x=910
  }
  meteor5_x-= meteor5_speed;
  if (meteor5_x<=0){
-	meteor5_speed+=5;
+	meteor5_speed = 8 + Math.random() * 4;
+	meteor5_y = Math.random() * (canvas.height - 90);
 	meteor5_x=910
  }
 
-//////////
-//Collision Detection
-//////////
-function CheckCollision(meteor_x, meteor_y){
- if(player_x + 30 < meteor_x + 60 &&
-    player_x + 120 > meteor_x + 15 &&
-    player_y + 30 < meteor_y + 60 &&
-    player_y + 120 > meteor_y + 15)
- {
-  rockethit = true;
-  bg_img.src = "images/GameOver.png";
- }
-}
  CheckCollision(meteor_x, meteor_y);
  CheckCollision(meteor2_x, meteor2_y);
  CheckCollision(meteor3_x, meteor3_y);
  CheckCollision(meteor4_x, meteor4_y);
  CheckCollision(meteor5_x, meteor5_y);
+}
+
+//////////
+//Collision Detection
+//////////
+function CheckCollision(meteor_x, meteor_y){
+ if(player_x + 20 < meteor_x + 40 &&
+    player_x + 80 > meteor_x + 10 &&
+    player_y + 20 < meteor_y + 40 &&
+    player_y + 80 > meteor_y + 10)
+ {
+  rockethit = true;
+  bg_img.src = "images/GameOver.png";
+ }
 }
 
 //////////
@@ -146,6 +162,7 @@ function Draw(){
 	ctx.drawImage(meteor_img, meteor2_x,meteor2_y,90,90);
 	ctx.drawImage(meteor_img, meteor3_x,meteor3_y,90,90);
 	ctx.drawImage(meteor_img, meteor4_x,meteor4_y,90,90);
+	ctx.drawImage(meteor_img, meteor5_x,meteor5_y,90,90);
 	
 	ctx.drawImage(player_img,player_x,player_y,150, 150);	
 }
@@ -161,6 +178,13 @@ function KeyDown(event)
 function KeyUp(event)
 {
 	keys[event.key] = false;
+}
+
+function StartGame()
+{
+	gameStarted = true;
+	document.getElementById('startBtn').disabled = true;
+	document.getElementById('startBtn').textContent = 'Game Running...';
 }
 
 </script>
