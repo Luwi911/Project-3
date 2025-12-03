@@ -9,63 +9,60 @@
 	
 	<h1>Asteroid Belt</h1>
 
-
-
 </header>
 
 <main>
 	<h2> Game Controls</h2>
 
     <ul>
-        <li>Up arrow = move up</li>
-        <li>Down arrow = move down</li>
+        <li>UP Arrow Key - Move Up</li>
+        <li>DOWN Arrow Key - Move Down</li>
     </ul>
 
     <h2> Instructions</h2>
     <p> 
-        You are a space traveler travelling through space but you come acroos an asterod belt. You must dodge the meteors for as long as humanly possible
+    	You are a rocket travelling through space but you come across an asteroid belt. You must dodge the meteors for as long as humanly possible.
+    </p>
+	<p> 
+    	The longer you last for, the more points you earn. Per every 500 points, the meteors will speed up.
     </p>
 
     <h2> Demo Video</h2>
 
-
     <h2> Gameplay Screenshots</h2>
-
-
 </main>
+
 <div style="position: relative; width: 900px; height: 700px; display: inline-block;">
 	<canvas id="myCanvas" width="900" height="700"
 	style="border:1px solid #d3d3d3; display: block;">
 	Your browser does not support the HTML5 canvas tag.</canvas>
 	<button id="startBtn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 15px 30px; font-size: 18px; cursor: pointer; z-index: 10;">Start Game</button>
+	<button id="restartBtn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 15px 30px; font-size: 18px; cursor: pointer; z-index: 11; display: none;">Restart</button>
 </div>
 
 <script>
 	
 //////////
-//Init
+// Variables
 //////////
 var canvas;
 var ctx;
 var player_img;
+var meteor_img;
+var bg_img;
+
 var player_x = 80;
 var player_y = 0;
-var player_vy = 0;
 var rocketSpeed = 8;
 
-var meteor_img;
 var meteor_x = 910;
 var meteor_y = 200;
-
 var meteor2_x = 1200;
 var meteor2_y = 600;
-
 var meteor3_x = 1600;
 var meteor3_y = 400;
-
 var meteor4_x = 1950;
 var meteor4_y = 20;
-
 var meteor5_x = 2000;
 var meteor5_y = 300;
 
@@ -76,21 +73,28 @@ var meteor4_speed = 8 + Math.random() * 4;
 var meteor5_speed = 8 + Math.random() * 4;
 
 var rockethit = false;
-var bg_img;
 var keys = {};
 var gameStarted = false;
 
+var score = 0;
+var scoreIntervalId = null;
+
+//////////
+//Init
+//////////
 function Init()
 {
+	//place canvas and loading images
 	canvas = document.getElementById("myCanvas");
 	ctx = canvas.getContext("2d");
 	player_img = new Image();
 	player_img.src = "images/rocket.png";
 	meteor_img = new Image();
-	meteor_img.src = "images/meteor.gif"
+	meteor_img.src = "images/meteor.gif";
 	bg_img = new Image();
-	bg_img.src = "images/space.png"
+	bg_img.src = "images/space.png";
 
+	//randomize meteor starting y positions
 	meteor_y = Math.random() * (canvas.height - 90);
 	meteor2_y = Math.random() * (canvas.height - 90);
 	meteor3_y = Math.random() * (canvas.height - 90);
@@ -98,92 +102,111 @@ function Init()
 	meteor5_y = Math.random() * (canvas.height - 90);
 }
 
-//set main loop and frame rate
+//main loop set up
 setInterval(MainLoop, 16);
 window.addEventListener('keydown', KeyDown);
 window.addEventListener('keyup', KeyUp);
 document.getElementById('startBtn').addEventListener('click', StartGame);
+document.getElementById('restartBtn').addEventListener('click', RestartGame);
 
 //////////
-//Min loop
+//Main loop function
 //////////
 function MainLoop()
-{
+{	
+	//update function will run if the game has started, and rocket has not hit meteor
 	if(gameStarted && !rockethit){
 		Update();
 	}
 	Draw();
 }
 
+//////////
+//Update
+//////////
 function Update()
 {
- if(keys['ArrowUp'] && player_y > 0)
- {
- 	player_y -= rocketSpeed;
- }
- if(keys['ArrowDown'] && player_y < canvas.height - 150)
- {
- 	player_y += rocketSpeed;
- }
+	if(keys['ArrowUp'] && player_y > 0)
+	{
+		player_y -= rocketSpeed;
+	}
+	if(keys['ArrowDown'] && player_y < canvas.height - 150)
+	{
+		player_y += rocketSpeed;
+	}
 
- meteor_x-= meteor_speed;
- if (meteor_x<=0){
-	meteor_speed = 8 + Math.random() * 4;
-	meteor_y = Math.random() * (canvas.height - 90);
-	meteor_x=910
- }
-  meteor2_x-= meteor2_speed;
- if (meteor2_x<=0){
-	meteor2_speed = 8 + Math.random() * 4;
-	meteor2_y = Math.random() * (canvas.height - 90);
-	meteor2_x=910
- }
+	// speed boost based on score: +1 per 500 points
+	var scoreSpeedBoost = Math.floor(score / 500);
 
- meteor3_x-= meteor3_speed;
- if (meteor3_x<=0){
-	meteor3_speed = 8 + Math.random() * 4;
-	meteor3_y = Math.random() * (canvas.height - 90);
-	meteor3_x=910
- }
- meteor4_x-= meteor4_speed;
- if (meteor4_x<=0){
-	meteor4_speed = 8 + Math.random() * 4;
-	meteor4_y = Math.random() * (canvas.height - 90);
-	meteor4_x=910
- }
- meteor5_x-= meteor5_speed;
- if (meteor5_x<=0){
-	meteor5_speed = 8 + Math.random() * 4;
-	meteor5_y = Math.random() * (canvas.height - 90);
-	meteor5_x=910
- }
+	//meteor position module
+	meteor_x -= (meteor_speed + scoreSpeedBoost);
+	//reset meteor when it goes off screen
+	if (meteor_x <= 0){
+		// randomize speed and y position
+		meteor_speed = 8 + Math.random() * 4;
+		// random y position within canvas height
+		meteor_y = Math.random() * (canvas.height - 90);
+		// meteor back to offscreen on the right
+		meteor_x = 910;
+	} //same is applicable for the rest of the meteors.
 
- CheckCollision(meteor_x, meteor_y);
- CheckCollision(meteor2_x, meteor2_y);
- CheckCollision(meteor3_x, meteor3_y);
- CheckCollision(meteor4_x, meteor4_y);
- CheckCollision(meteor5_x, meteor5_y);
+	meteor2_x -= (meteor2_speed + scoreSpeedBoost);
+	if (meteor2_x <= 0){
+		meteor2_speed = 8 + Math.random() * 4;
+		meteor2_y = Math.random() * (canvas.height - 90);
+		meteor2_x = 910;
+	}
+
+	meteor3_x -= (meteor3_speed + scoreSpeedBoost);
+	if (meteor3_x <= 0){
+		meteor3_speed = 8 + Math.random() * 4;
+		meteor3_y = Math.random() * (canvas.height - 90);
+		meteor3_x = 910;
+	}
+
+	meteor4_x -= (meteor4_speed + scoreSpeedBoost);
+	if (meteor4_x <= 0){
+		meteor4_speed = 8 + Math.random() * 4;
+		meteor4_y = Math.random() * (canvas.height - 90);
+		meteor4_x = 910;
+	}
+
+	meteor5_x -= (meteor5_speed + scoreSpeedBoost);
+	if (meteor5_x <= 0){
+		meteor5_speed = 8 + Math.random() * 4;
+		meteor5_y = Math.random() * (canvas.height - 90);
+		meteor5_x = 910;
+	}
+	//collision detection is ran for all meteors
+	CheckCollision(meteor_x, meteor_y);
+	CheckCollision(meteor2_x, meteor2_y);
+	CheckCollision(meteor3_x, meteor3_y);
+	CheckCollision(meteor4_x, meteor4_y);
+	CheckCollision(meteor5_x, meteor5_y);
 }
 
-//////////
-//Collision Detection
-//////////
 function CheckCollision(meteor_x, meteor_y){
- if(player_x + 20 < meteor_x + 40 &&
-    player_x + 80 > meteor_x + 10 &&
-    player_y + 20 < meteor_y + 40 &&
-    player_y + 80 > meteor_y + 10)
- {
-  rockethit = true;
-  bg_img.src = "images/GameOver.png";
- }
+	// simple AABB collision detection
+	if(player_x + 20 < meteor_x + 40 &&
+	   player_x + 80 > meteor_x + 10 &&
+	   player_y + 20 < meteor_y + 40 &&
+	   player_y + 80 > meteor_y + 10)
+	{
+		// collision detected
+		rockethit = true;
+		// change background to game over image
+		bg_img.src = "images/GameOver.png";
+		// stop score interval
+		if(scoreIntervalId){
+			clearInterval(scoreIntervalId);
+			scoreIntervalId = null;
+		}
+		// show restart button overlay
+		document.getElementById('restartBtn').style.display = 'block';
+	}
 }
 
-//////////
-//Draw
-//////////
 function Draw(){
-	
 	ctx.clearRect(0,0,canvas.width,canvas.height);
 	ctx.drawImage(bg_img,0,0, 900, 900);
 
@@ -192,7 +215,14 @@ function Draw(){
 	ctx.drawImage(meteor_img, meteor3_x,meteor3_y,90,90);
 	ctx.drawImage(meteor_img, meteor4_x,meteor4_y,90,90);
 	ctx.drawImage(meteor_img, meteor5_x,meteor5_y,90,90);
-	ctx.drawImage(player_img,player_x,player_y,150, 150);	
+	ctx.drawImage(player_img,player_x,player_y,150, 150);
+
+	// draw score in top-right corner
+	ctx.fillStyle = "white";
+	ctx.font = "24px Bahnschrift";
+	ctx.textAlign = "right";
+	ctx.fillText("Score: " + score, canvas.width - 20, 34);
+	ctx.textAlign = "start";
 }
 
 //////////
@@ -200,6 +230,7 @@ function Draw(){
 //////////
 function KeyDown(event)
 {
+	//inputs are put into an array for checking in update function
 	keys[event.key] = true;
 }
 
@@ -211,9 +242,54 @@ function KeyUp(event)
 function StartGame()
 {
 	gameStarted = true;
+	// remove start button
 	document.getElementById('startBtn').style.display = 'none';
+	// reset score to 0
+	score = 0;
+	// start score interval
+	if(scoreIntervalId){
+		clearInterval(scoreIntervalId);
+	}
+	// increase score by 100 every 5 seconds
+	scoreIntervalId = setInterval(function(){
+		if(gameStarted && !rockethit){
+			score += 100;
+		}
+	}, 5000);
 }
 
+function RestartGame()
+{
+	// reset flags and positions
+	rockethit = false;
+	bg_img.src = "images/space.png";
+	player_y = 0;
+
+	// initialize meteor positions and speeds
+	meteor_x = 910;
+	meteor2_x = 1200;
+	meteor3_x = 1600;
+	meteor4_x = 1950;
+	meteor5_x = 2000;
+
+	meteor_y = Math.random() * (canvas.height - 90);
+	meteor2_y = Math.random() * (canvas.height - 90);
+	meteor3_y = Math.random() * (canvas.height - 90);
+	meteor4_y = Math.random() * (canvas.height - 90);
+	meteor5_y = Math.random() * (canvas.height - 90);
+
+	meteor_speed = 8 + Math.random() * 4;
+	meteor2_speed = 8 + Math.random() * 4;
+	meteor3_speed = 8 + Math.random() * 4;
+	meteor4_speed = 8 + Math.random() * 4;
+	meteor5_speed = 8 + Math.random() * 4;
+
+	// remove restart button
+	document.getElementById('restartBtn').style.display = 'none';
+	// start the game again
+	StartGame();
+}
+</script>
 </script>
 
 </body>
