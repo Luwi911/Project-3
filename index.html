@@ -22,8 +22,8 @@ var ctx;
 var player_img;
 var player_x = 80;
 var player_y = 0;
-var rocketMoveUp = 45;
-var rocketMoveDown = 45;
+var player_vy = 0;
+var rocketSpeed = 8;
 
 var meteor_img;
 var meteor_x = 910;
@@ -49,6 +49,7 @@ var meteor5_speed = 10;
 
 var rockethit = false;
 var bg_img;
+var keys = {};
 
 function Init()
 {
@@ -63,8 +64,9 @@ function Init()
 }
 
 //set main loop and frame rate
-setInterval(MainLoop, 100);
+setInterval(MainLoop, 16);
 window.addEventListener('keydown', KeyDown);
+window.addEventListener('keyup', KeyUp);
 
 //////////
 //Min loop
@@ -76,6 +78,15 @@ function MainLoop()
 }
 function Update()
 {
+ // Handle smooth rocket movement
+ if(keys['ArrowUp'] && player_y > 0)
+ {
+ 	player_y -= rocketSpeed;
+ }
+ if(keys['ArrowDown'] && player_y < canvas.height - 150)
+ {
+ 	player_y += rocketSpeed;
+ }
 
  meteor_x-= meteor_speed;
  if (meteor_x<=0){
@@ -87,7 +98,6 @@ function Update()
  if (meteor2_x<=0){
 	meteor2_speed+=5;
 	meteor2_x=910
-	
  }
 
  meteor3_x-= meteor3_speed;
@@ -133,20 +143,18 @@ function Draw()
 //////////
 //Events
 //////////
-function KeyDown()
+
+function KeyDown(event)
 {
-	if(event.key == "ArrowDown")
-	{
-		player_y += rocketMoveUp;
-	}
-    if(event.key == "ArrowUp")
-	{
-		player_y -= rocketMoveDown;
-	}
+	keys[event.key] = true;
 }
+
+function KeyUp(event)
+{
+	keys[event.key] = false;
+}
+
 </script>
-
-
 
 </body>
 </html>
