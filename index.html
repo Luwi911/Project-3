@@ -5,7 +5,7 @@
 </head>
 <body onload="Init()">
 
-<p>Canvas to fill:</p>
+
 <canvas id="myCanvas" width="900" height="700"
 style="border:1px solid #d3d3d3;">
 Your browser does not support the HTML5 canvas tag.</canvas>
@@ -20,14 +20,35 @@ Your browser does not support the HTML5 canvas tag.</canvas>
 var canvas;
 var ctx;
 var player_img;
-var player_x = 0;
+var player_x = 80;
 var player_y = 0;
 var rocketMoveUp = 45;
 var rocketMoveDown = 45;
-var test;
-var test_x;
-var test_y;
 
+var meteor_img;
+var meteor_x = 910;
+var meteor_y = 200;
+
+var meteor2_x = 1200;
+var meteor2_y = 600;
+
+var meteor3_x = 1600;
+var meteor3_y = 400;
+
+var meteor4_x = 1950;
+var meteor4_y = 20;
+
+var meteor5_x = 2000;
+var meteor5_y = 300;
+
+var meteor_speed = 10;
+var meteor2_speed = 10;
+var meteor3_speed = 10;
+var meteor4_speed = 10;
+var meteor5_speed = 10;
+
+var rockethit = false;
+var bg_img;
 
 function Init()
 {
@@ -35,7 +56,10 @@ function Init()
 	ctx = canvas.getContext("2d");
 	player_img = new Image();
 	player_img.src = "images/rocket.png";
-
+	meteor_img = new Image();
+	meteor_img.src = "images/meteor.gif"
+	bg_img = new Image();
+	bg_img.src = "images/space.png"
 }
 
 //set main loop and frame rate
@@ -52,13 +76,58 @@ function MainLoop()
 }
 function Update()
 {
+
+ meteor_x-= meteor_speed;
+ if (meteor_x<=0){
+	meteor_speed+=5;
+	meteor_x=910
+	
+ }
+  meteor2_x-= meteor2_speed;
+ if (meteor2_x<=0){
+	meteor2_speed+=5;
+	meteor2_x=910
+	
+ }
+
+ meteor3_x-= meteor3_speed;
+ if (meteor3_x<=0){
+	meteor3_speed+=5;
+	meteor3_x=910
+ }
+ meteor4_x-= meteor4_speed;
+ if (meteor4_x<=0){
+	meteor4_speed+=5;
+	meteor4_x=910
+ }
+ meteor5_x-= meteor5_speed;
+ if (meteor5_x<=0){
+	meteor5_speed+=5;
+	meteor5_x=910
+ }
+
+
+ var distance2 = (player_x-meteor_x)*(player_x-meteor_x)+(player_y-meteor_y)*(player_y-meteor_y);
+	var distance = Math.sqrt(distance2);
+	if(distance <= 10)
+	{
+		bg_img.src = "images/GameOver.png";
+		enemy_dead = true;
+	}
 }
 function Draw()
 {
+	
 	ctx.clearRect(0,0,canvas.width,canvas.height);
+	ctx.drawImage(bg_img,0,0, 900, 900);
 
-	ctx.drawImage(player_img,player_x,player_y);
-	ctx.drawImage(test,test_x,test_y)
+	ctx.drawImage(meteor_img, meteor_x,meteor_y,90,90);
+	ctx.drawImage(meteor_img, meteor2_x,meteor2_y,90,90);
+	ctx.drawImage(meteor_img, meteor3_x,meteor3_y,90,90);
+	ctx.drawImage(meteor_img, meteor4_x,meteor4_y,90,90);
+	
+	ctx.drawImage(player_img,player_x,player_y,150, 150);
+	
 }
 
 //////////
