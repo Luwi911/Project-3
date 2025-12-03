@@ -1,1 +1,21 @@
+body{
+    background-color: rgb(39, 33, 59);
+}
 
+
+header  {
+  background-color: rgb(31, 15, 85);
+ height: 50px;
+ display: flex;
+ align-items: center;
+ color: #f1faee;
+ gap: 25px;
+ padding: 25px;
+  align-items: center;
+}
+
+
+main{
+color: #f1faee;
+
+}

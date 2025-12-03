@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+    <head> 
+
+    <link rel="stylesheet" href="style.css" />
+
+    </head>
+
+<header> 
+	
+	<h1>Asteroid Belt</h1>
+
+
+
+</header>
+
+<main>
+	<h2> Game Controls</h2>
+
+    <ul>
+        <li>Up arrow = move up</li>
+        <li>Down arrow = move down</li>
+    </ul>
+
+    <h2> Instructions</h2>
+    <p> 
+        You are a space traveler travelling through space but you come acroos an asterod belt. You must dodge the meteors for as long as humanly possible
+    </p>
+
+    <h2> Demo Video</h2>
+
+
+    <h2> Gameplay Screenshots</h2>
+
+
+</main>
+
+</body>
+
+</html>
+
